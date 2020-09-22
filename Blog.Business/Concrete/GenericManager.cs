@@ -21,7 +21,7 @@ namespace Blog.Business.Concrete
             await _genericDal.AddAsync(entity);
         }
 
-        public async Task<T> FindById(int id)
+        public async Task<T> FindByIdAsync(int id)
         {
             return await _genericDal.FindByIdAsync(id);
         }

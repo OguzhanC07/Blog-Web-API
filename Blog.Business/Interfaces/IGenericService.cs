@@ -10,7 +10,7 @@ namespace Blog.Business.Interfaces
     public interface IGenericService<T> where T : class,ITable, new()
     {
         Task<List<T>> GetAllAsync();
-        Task<T> FindById(int id);
+        Task<T> FindByIdAsync(int id);
 
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);
