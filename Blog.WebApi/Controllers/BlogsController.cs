@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Blog.Business.Interfaces;
 using Blog.DTO.DTOs.BlogDtos;
+using Blog.DTO.DTOs.CategoryBlogDtos;
 using Blog.Entities.Concrete;
+using Blog.WebApi.CustomFilters;
 using Blog.WebApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,12 +35,15 @@ namespace Blog.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
+        [ServiceFilter(typeof(ValidId<Blogg>))]
         public async Task<IActionResult> GetById(int id)
         {
             return Ok(_mapper.Map<BlogListDto>(await _blogService.FindByIdAsync(id)));
         }
 
         [HttpPost]
+        [Authorize]
+        [ValidModel]
         public async Task<IActionResult> Create([FromForm]BlogAddModel blogAddModel)
         {
             var uploadModel = await UploadFileAsync(blogAddModel.Image, "image/jpeg");
@@ -60,6 +66,9 @@ namespace Blog.WebApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
+        [ValidModel]
+        [ServiceFilter(typeof(ValidId<Blogg>))]
         public async Task<IActionResult> Update(int id , [FromForm]BlogUpdateModel blogUpdateModel)
         {
             if (id != blogUpdateModel.Id)
@@ -95,6 +104,8 @@ namespace Blog.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
+        [ServiceFilter(typeof(ValidId<Blogg>))]
         public async Task<IActionResult> Remove(int id)
         {
             var result = await _blogService.FindByIdAsync(id);
@@ -109,6 +120,27 @@ namespace Blog.WebApi.Controllers
             }
         }
 
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> AddToCategory(CategoryBlogDto categoryBlogDto)
+        {
+            await _blogService.AddToCategoryAsync(categoryBlogDto);
+            return Created("", categoryBlogDto);
+        }
+
+        [HttpDelete("[action]")]
+        public async Task<IActionResult> RemoveFromCategory(CategoryBlogDto categoryBlogDto)
+        {
+            await _blogService.RemoveFromCategoryAsync(categoryBlogDto);
+            return NoContent();
+        }
+
+        [HttpGet("[action]")]
+        [ServiceFilter(typeof(ValidId<Category>))]
+        public async Task<IActionResult> GetAllByCategoryId(int id)
+        {
+            return Ok(await _blogService.GetAllByCategoryIdAsync(id));
+        }
 
 
     }

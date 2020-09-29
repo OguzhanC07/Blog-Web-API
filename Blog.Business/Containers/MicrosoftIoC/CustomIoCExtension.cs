@@ -1,7 +1,13 @@
 ﻿using Blog.Business.Concrete;
 using Blog.Business.Interfaces;
+using Blog.Business.Tools.JwtTool;
+using Blog.Business.ValidationRules.FluentValidation;
 using Blog.DataAccess.Concrete.EntityFrameworkCore.Repositories;
 using Blog.DataAccess.Interfaces;
+using Blog.DTO.DTOs.AppUserDtos;
+using Blog.DTO.DTOs.CategoryBlogDtos;
+using Blog.DTO.DTOs.CategoryDtos;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -18,6 +24,21 @@ namespace Blog.Business.Containers.MicrosoftIoC
 
             services.AddScoped<IBlogDal, EfBlogRepository>();
             services.AddScoped<IBlogService, BlogManager>();
+
+
+            services.AddScoped<ICategoryDal, EfCategoryRepository>();
+            services.AddScoped<ICategoryService, CategoryManager>();
+
+            services.AddScoped<IAppUserService, AppUserManager>();
+            services.AddScoped<IAppUserDal, EfAppUserRepository>();
+
+            services.AddScoped<IJwtService, JwtManager>();
+
+
+            services.AddTransient<IValidator<AppUserLoginDto>, AppUserLoginValidator>();
+            services.AddTransient<IValidator<CategoryAddDto>, CategoryAddValidator>();
+            services.AddTransient<IValidator<CategoryBlogDto>, CategoryBlogValidator>();
+            services.AddTransient<IValidator<CategoryUpdateDto>, CategoryUpdateValidator>();
         }
     }
 }
