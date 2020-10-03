@@ -135,7 +135,7 @@ namespace Blog.WebApi.Controllers
             return NoContent();
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]/{id}")]
         [ServiceFilter(typeof(ValidId<Category>))]
         public async Task<IActionResult> GetAllByCategoryId(int id)
         {

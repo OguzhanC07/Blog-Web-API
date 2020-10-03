@@ -22,7 +22,6 @@ namespace Blog.DataAccess.Concrete.EntityFrameworkCore.Repositories
                 categoryBlog = categoryBlog
             }).Where(I => I.categoryBlog.CategoryId == categoryId).Select(I => new Blogg
             {
-                AppUser = I.blog.AppUser,
                 AppUserId = I.blog.AppUserId,
                 CategoryBlogs = I.blog.CategoryBlogs,
                 Comments = I.blog.Comments,
@@ -32,7 +31,7 @@ namespace Blog.DataAccess.Concrete.EntityFrameworkCore.Repositories
                 PostedTime = I.blog.PostedTime,
                 ShortDesc = I.blog.ShortDesc,
                 Title = I.blog.Title
-            }).ToListAsync();
+            }).OrderByDescending(I=>I.PostedTime).ToListAsync();
         }
     }
 }

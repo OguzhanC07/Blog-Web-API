@@ -24,13 +24,20 @@ namespace Blog.WebApi.CustomFilters
         {
             var dictionary = context.ActionArguments.Where(I => I.Key == "id").FirstOrDefault();
 
-            var id = int.Parse(dictionary.Value.ToString());
-
-            var entity = _genericService.FindByIdAsync(id).Result;
-
-            if (entity == null)
+            if (dictionary.Value == null)
             {
-                context.Result = new NotFoundObjectResult($"{id} değerinde bir kayıt yoktur.");
+                context.Result = new NotFoundObjectResult("Yanlış giriş şekli");
+            }
+            else
+            {
+                var id = int.Parse(dictionary.Value.ToString());
+
+                var entity = _genericService.FindByIdAsync(id).Result;
+
+                if (entity == null)
+                {
+                    context.Result = new NotFoundObjectResult($"{id} değerinde bir kayıt yoktur.");
+                }
             }
         
         }

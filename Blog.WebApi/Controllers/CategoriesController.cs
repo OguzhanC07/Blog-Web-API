@@ -85,7 +85,8 @@ namespace Blog.WebApi.Controllers
             {
                 CategoryWithBlogsCountDto dto = new CategoryWithBlogsCountDto
                 {
-                    Category = category,
+                    CategoryName = category.Name,
+                    CategoryId = category.Id,
                     BlogsCount = category.CategoryBlogs.Count
                 };
 
