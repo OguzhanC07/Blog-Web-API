@@ -51,5 +51,20 @@ namespace Blog.Business.Concrete
         {
             return await _blogDal.GetAllByCategoryIdAsync(categoryId);
         }
+
+        public async Task<List<Category>> GetCategoriesAsync(int blogId)
+        {
+            return await _blogDal.GetCategoriesAsync(blogId);        
+        }
+
+        public async Task<List<Blogg>> GetLastFiveBlogAsync()
+        {
+            return await _blogDal.GetLastFiveBlogAsync();
+        }
+
+        public async Task<List<Blogg>> SearchAsync(string searchString)
+        {
+            return await _blogDal.GetAllAsync(I => I.Title.Contains(searchString) || I.ShortDesc.Contains(searchString) || I.Description.Contains(searchString));
+        }
     }
 }

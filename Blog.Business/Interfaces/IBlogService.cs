@@ -14,5 +14,9 @@ namespace Blog.Business.Interfaces
         Task AddToCategoryAsync(CategoryBlogDto categoryBlogDto);
         Task RemoveFromCategoryAsync(CategoryBlogDto categoryBlogDto);
         Task<List<Blogg>> GetAllByCategoryIdAsync(int categoryId);
+        Task<List<Category>> GetCategoriesAsync(int blogId);
+        Task<List<Blogg>> GetLastFiveBlogAsync();
+        Task<List<Blogg>> SearchAsync(string searchString);
+    
     }
 }

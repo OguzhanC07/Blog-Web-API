@@ -5,8 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Blog.Business.Interfaces;
+using Blog.DataAccess.Interfaces;
 using Blog.DTO.DTOs.BlogDtos;
 using Blog.DTO.DTOs.CategoryBlogDtos;
+using Blog.DTO.DTOs.CategoryDtos;
+using Blog.DTO.DTOs.CommentDtos;
 using Blog.Entities.Concrete;
 using Blog.WebApi.CustomFilters;
 using Blog.WebApi.Models;
@@ -22,10 +25,13 @@ namespace Blog.WebApi.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IBlogService _blogService;
-        public BlogsController(IBlogService blogService, IMapper mapper)
+        private readonly ICommentService _commentService;
+
+        public BlogsController(ICommentService commentService, IBlogService blogService, IMapper mapper)
         {
             _blogService = blogService;
             _mapper = mapper;
+            _commentService = commentService;
         }
 
         [HttpGet]
@@ -44,7 +50,7 @@ namespace Blog.WebApi.Controllers
         [HttpPost]
         [Authorize]
         [ValidModel]
-        public async Task<IActionResult> Create([FromForm]BlogAddModel blogAddModel)
+        public async Task<IActionResult> Create([FromForm] BlogAddModel blogAddModel)
         {
             var uploadModel = await UploadFileAsync(blogAddModel.Image, "image/jpeg");
 
@@ -69,7 +75,7 @@ namespace Blog.WebApi.Controllers
         [Authorize]
         [ValidModel]
         [ServiceFilter(typeof(ValidId<Blogg>))]
-        public async Task<IActionResult> Update(int id , [FromForm]BlogUpdateModel blogUpdateModel)
+        public async Task<IActionResult> Update(int id, [FromForm] BlogUpdateModel blogUpdateModel)
         {
             if (id != blogUpdateModel.Id)
                 return BadRequest("Geçersiz id");
@@ -78,8 +84,8 @@ namespace Blog.WebApi.Controllers
 
             if (uploadModel.UploadState == Enums.UploadState.Success)
             {
-                var updatedBlog= await _blogService.FindByIdAsync(blogUpdateModel.Id);
-                
+                var updatedBlog = await _blogService.FindByIdAsync(blogUpdateModel.Id);
+
                 updatedBlog.ShortDesc = blogUpdateModel.ShortDesc;
                 updatedBlog.Title = blogUpdateModel.Title;
                 updatedBlog.Description = blogUpdateModel.Description;
@@ -93,7 +99,7 @@ namespace Blog.WebApi.Controllers
                 updatedBlog.ShortDesc = blogUpdateModel.ShortDesc;
                 updatedBlog.Title = blogUpdateModel.Title;
                 updatedBlog.Description = blogUpdateModel.Description;
-                
+
                 await _blogService.UpdateAsync(updatedBlog);
                 return NoContent();
             }
@@ -106,18 +112,10 @@ namespace Blog.WebApi.Controllers
         [HttpDelete("{id}")]
         [Authorize]
         [ServiceFilter(typeof(ValidId<Blogg>))]
-        public async Task<IActionResult> Remove(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var result = await _blogService.FindByIdAsync(id);
-            if (result==null)
-            {
-                return BadRequest("Geçersiz id");
-            }
-            else
-            {
-                await _blogService.RemoveAsync(new Blogg { Id=id});
-                return NoContent();
-            }
+            await _blogService.RemoveAsync(await _blogService.FindByIdAsync(id));
+            return NoContent();
         }
 
 
@@ -142,6 +140,40 @@ namespace Blog.WebApi.Controllers
             return Ok(await _blogService.GetAllByCategoryIdAsync(id));
         }
 
+        [HttpGet("{id}/[action]")]
+        [ServiceFilter(typeof(ValidId<Blogg>))]
+        public async Task<IActionResult> GetCategories(int id)
+        {
+            return Ok(_mapper.Map<List<CategoryListDto>>(await _blogService.GetCategoriesAsync(id)));
+        }
 
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetLastFiveBlog()
+        {
+            return Ok(_mapper.Map<List<BlogListDto>>(await _blogService.GetLastFiveBlogAsync()));
+        }
+
+        [HttpGet("{id}/[action]")]
+        public async Task<IActionResult> GetComments([FromRoute] int id,[FromQuery] int? parentCommentId)
+        {
+            return Ok(_mapper.Map<List<CommentListDto>>(await _commentService.GetAllWithSubCommentsAsync(id, parentCommentId)));
+        }
+
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Search([FromQuery] string s)
+        {
+            return Ok(_mapper.Map<List<BlogListDto>>(await _blogService.SearchAsync(s)));
+        }
+
+        [HttpPost("[action]")]
+        [ValidModel]
+        public async Task<IActionResult> AddComment(CommentAddDto commentAddDto)
+        {
+            commentAddDto.PostedTime = DateTime.Now;
+            await _commentService.AddAsync(_mapper.Map<Comment>(commentAddDto));
+            return Created("",commentAddDto);
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Blog.DTO.DTOs.BlogDtos;
 using Blog.DTO.DTOs.CategoryDtos;
+using Blog.DTO.DTOs.CommentDtos;
 using Blog.Entities.Concrete;
 using Blog.WebApi.Models;
 using System;
@@ -34,8 +35,18 @@ namespace Blog.WebApi.Mapping.AutoMapper
             CreateMap<Category, CategoryUpdateDto>();
 
             CreateMap<CategoryListDto, Category>();
-            CreateMap<Category, CategoryListDto>(); 
+            CreateMap<Category, CategoryListDto>();
             #endregion
+
+
+            #region Comment
+            CreateMap<Comment, CommentListDto>();
+            CreateMap<CommentListDto, Comment>();
+
+            CreateMap<Comment, CommentAddDto>();
+            CreateMap<CommentAddDto, Comment>();
+            #endregion
+
 
         }
     }
