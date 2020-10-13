@@ -28,7 +28,7 @@ namespace Blog.Business.Concrete
         public async Task AddToCategoryAsync(CategoryBlogDto categoryBlogDto)
         {
             var control = await _categoryDal.GetAsync(I=>I.BlogId==categoryBlogDto.BlogId && I.CategoryId==categoryBlogDto.CategoryId);
-            if (control != null)
+            if (control == null)
             {
                 await _categoryDal.AddAsync(new CategoryBlog { BlogId = categoryBlogDto.BlogId, CategoryId = categoryBlogDto.CategoryId });
             }

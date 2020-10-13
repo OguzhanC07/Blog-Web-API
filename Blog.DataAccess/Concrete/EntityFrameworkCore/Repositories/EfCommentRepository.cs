@@ -23,7 +23,7 @@ namespace Blog.DataAccess.Concrete.EntityFrameworkCore.Repositories
         {
             using var context = new BlogDbContext();
 
-            var comments = await context.Comments.Where(I => I.BlogId == blogId && I.ParentCommentId == parentId).OrderByDescending(I => I.PostedTime).ToListAsync();
+            var comments = await context.Comments.Where(I => I.BlogId == blogId && I.ParentCommentId == parentId).OrderBy(I => I.PostedTime).ToListAsync();
 
             if (comments.Count > 0)
             {
